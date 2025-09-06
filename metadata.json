@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Prophète sans censure,",
+  "description": "Prophète sans censure est un chatbot IA avancé conçu pour fournir des réponses détaillées et non censurées sur une variété de sujets, tout en offrant des capacités de prédiction et de développement ultra avancées. Il est capable de coder, construire, et développer des applications, jeux, sites web, et de convertir des images en applications fonctionnelles et parfaites.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
