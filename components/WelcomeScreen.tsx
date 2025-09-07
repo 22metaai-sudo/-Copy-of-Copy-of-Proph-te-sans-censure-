@@ -106,14 +106,23 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onNavigate }) => {
             onClick={() => setMenuOpen(!menuOpen)}
             className="p-2 rounded-full text-white bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-colors"
             aria-label="Ouvrir le menu"
+            aria-haspopup="true"
+            aria-expanded={menuOpen}
+            aria-controls="welcome-menu"
           >
             <MenuIcon className="h-6 w-6" />
           </button>
           {menuOpen && (
-            <div className="absolute top-full right-0 mt-2 w-64 bg-gray-800/80 backdrop-blur-lg rounded-lg shadow-xl border border-gray-700 p-2 space-y-1 animate-fade-in">
+            <div 
+              id="welcome-menu"
+              role="menu"
+              aria-label="Menu des fonctionnalités"
+              className="absolute top-full right-0 mt-2 w-64 bg-gray-800/80 backdrop-blur-lg rounded-lg shadow-xl border border-gray-700 p-2 space-y-1 animate-fade-in"
+            >
               {features.map(feature => (
                  <button
                     key={feature.view}
+                    role="menuitem"
                     onClick={() => {
                       onNavigate(feature.view);
                       setMenuOpen(false);

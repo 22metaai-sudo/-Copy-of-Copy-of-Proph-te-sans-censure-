@@ -9,6 +9,9 @@ import { MicrophoneIcon } from './icons/MicrophoneIcon';
 import { PaperclipIcon } from './icons/PaperclipIcon';
 import { XCircleIcon } from './icons/XCircleIcon';
 import { LogoIcon } from './icons/LogoIcon';
+import { DownloadIcon } from './icons/DownloadIcon';
+import { ClipboardIcon } from './icons/ClipboardIcon';
+import { CheckIcon } from './icons/CheckIcon';
 
 
 interface ChatViewProps {
@@ -19,7 +22,7 @@ interface ChatViewProps {
 const suggestionButtons = [
     { title: "Écris un poème", subtitle: "sur le thème de la mer des Caraïbes" },
     { title: "Explique un concept complexe", subtitle: "comme un trou noir, simplement" },
-    { title: "Donne-moi une idée de projet", subtitle: "en Python avec une API web" },
+    { title: "Fais une prédiction", subtitle: "sur l'évolution de l'IA en 2025" },
     { title: "Crée une recette de cuisine", subtitle: "originale avec du fruit à pain" },
 ];
 
@@ -36,6 +39,68 @@ if (SpeechRecognition) {
 const SUPPORTED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 const MAX_FILE_SIZE_MB = 4;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+const ChatActions: React.FC<{ messages: Message[], conversationTitle: string }> = ({ messages, conversationTitle }) => {
+    const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
+
+    const formatConversation = useCallback(() => {
+        return messages.map(msg => {
+            const author = msg.author === MessageAuthor.USER ? 'Utilisateur' : 'Prophète';
+            let content = `${author}:\n${msg.content}`;
+            if (msg.image) {
+                content += "\n[Image jointe]";
+            }
+            return content;
+        }).join('\n\n---\n\n');
+    }, [messages]);
+
+    const handleCopy = useCallback(() => {
+        if (copyStatus === 'copied') return;
+        const textToCopy = formatConversation();
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            setCopyStatus('copied');
+            setTimeout(() => setCopyStatus('idle'), 2000);
+        }).catch(err => {
+            console.error("Failed to copy conversation:", err);
+            alert("La copie a échoué.");
+        });
+    }, [formatConversation, copyStatus]);
+    
+    const handleDownload = useCallback(() => {
+        const textToDownload = formatConversation();
+        const blob = new Blob([textToDownload], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        const safeTitle = conversationTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        link.download = `conversation-${safeTitle || Date.now()}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, [formatConversation, conversationTitle]);
+
+    if (messages.length === 0) return null;
+
+    return (
+        <div className="max-w-4xl w-full mx-auto mb-2 flex items-center justify-end gap-2">
+            <button
+                onClick={handleCopy}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-gray-700 dark:text-gray-200"
+            >
+                {copyStatus === 'copied' ? <CheckIcon className="h-4 w-4 text-green-500" /> : <ClipboardIcon className="h-4 w-4" />}
+                {copyStatus === 'copied' ? 'Copié' : 'Copier'}
+            </button>
+            <button
+                onClick={handleDownload}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium text-gray-700 dark:text-gray-200"
+            >
+                <DownloadIcon className="h-4 w-4" />
+                Télécharger
+            </button>
+        </div>
+    );
+};
 
 export const ChatView: React.FC<ChatViewProps> = ({ conversation, onConversationUpdate }) => {
   const [input, setInput] = useState('');
@@ -317,10 +382,10 @@ export const ChatView: React.FC<ChatViewProps> = ({ conversation, onConversation
       </div>
 
       <div className="max-w-4xl w-full mx-auto">
+        <ChatActions messages={messages} conversationTitle={conversation.title} />
         <form
             onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
             className="relative"
-            role="search"
         >
           {attachedFile && (
              <div className="relative w-fit mb-2 p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm">
@@ -362,6 +427,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ conversation, onConversation
                     handleSendMessage();
                 }
                 }}
+                aria-label="Message à Prophète"
                 placeholder="Discutez avec Prophète..."
                 className="flex-grow bg-transparent placeholder-gray-500 dark:placeholder-gray-400 text-gray-800 dark:text-gray-200 text-base focus:outline-none resize-none py-2.5 px-2 max-h-48"
                 rows={1}

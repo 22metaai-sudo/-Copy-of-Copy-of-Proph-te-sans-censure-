@@ -92,6 +92,7 @@ export const SlidesGenerationView: React.FC = () => {
                             value={topic}
                             onChange={e => setTopic(e.target.value)}
                             placeholder="Ex: L'histoire du carnaval en Haïti"
+                            aria-label="Sujet de la présentation"
                             className="w-full p-3 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                             disabled={isLoading}
                         />
@@ -144,11 +145,11 @@ export const SlidesGenerationView: React.FC = () => {
                             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700/60">
                                 <button onClick={goToPrevSlide} disabled={currentSlide === 0} className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors">Précédent</button>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={handleCopySlide} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Copier le contenu de la diapositive">
+                                    <button onClick={handleCopySlide} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Copier le contenu de la diapositive">
                                          {isCopied ? <CheckIcon className="h-5 w-5 text-green-500"/> : <ClipboardIcon className="h-5 w-5"/>}
                                         <span className="hidden sm:inline">{isCopied ? 'Copié' : 'Copier'}</span>
                                     </button>
-                                     <button onClick={handleDownloadTxt} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" title="Télécharger toute la présentation en .txt">
+                                     <button onClick={handleDownloadTxt} className="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" aria-label="Télécharger toute la présentation en .txt">
                                         <DownloadIcon className="h-5 w-5"/>
                                         <span className="hidden sm:inline">TXT</span>
                                     </button>

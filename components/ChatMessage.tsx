@@ -8,6 +8,7 @@ import { CheckIcon } from './icons/CheckIcon';
 import { SpeakerWaveIcon } from './icons/SpeakerWaveIcon';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { DownloadIcon } from './icons/DownloadIcon';
+import { PencilIcon } from './icons/PencilIcon';
 
 const CodeBlock = ({ code }: { code: string }) => {
     const [isCopied, setIsCopied] = useState(false);
@@ -25,8 +26,8 @@ const CodeBlock = ({ code }: { code: string }) => {
             </pre>
             <button
                 onClick={handleCopy}
-                data-tooltip={isCopied ? "Copié !" : "Copier le code"}
-                className="absolute top-2 right-2 p-1.5 bg-gray-700/50 rounded-md text-gray-300 hover:bg-gray-600/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label={isCopied ? "Copié !" : "Copier le code"}
+                className="absolute top-2 right-2 p-1.5 bg-gray-700/50 rounded-md text-gray-300 hover:bg-gray-600/50 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
             >
                 {isCopied ? <CheckIcon className="h-4 w-4 text-green-400" /> : <ClipboardIcon className="h-4 w-4" />}
             </button>
@@ -209,11 +210,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     speech.speak(utterance);
   };
 
+  const handleEditImage = () => {
+    if (message.image) {
+        const event = new CustomEvent('editImage', { detail: message.image });
+        window.dispatchEvent(event);
+    }
+  };
+
   return (
     <div className={`flex items-start gap-4 ${isUser ? 'justify-end' : ''} animate-fade-in`}>
       {!isUser && (
         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-md">
-          <LogoIcon className="h-6 w-6 text-white" />
+          <LogoIcon className="h-6 w-6 text-white" aria-hidden="true" />
         </div>
       )}
       <div className={`max-w-2xl w-fit ${isUser ? 'order-1' : 'order-2'}`}>
@@ -234,11 +242,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                         className="rounded-lg max-w-full h-auto"
                     />
                      {!isUser && (
-                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={handleCopyImage} className="p-1.5 text-white hover:bg-white/20 rounded-md" data-tooltip={isImageCopied ? "Copié !" : "Copier l'image"}>
+                        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 p-1 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                            <button onClick={handleCopyImage} className="p-1.5 text-white hover:bg-white/20 rounded-md" aria-label={isImageCopied ? "Copié !" : "Copier l'image"}>
                                  {isImageCopied ? <CheckIcon className="h-4 w-4 text-green-400" /> : <ClipboardIcon className="h-4 w-4" />}
                             </button>
-                            <a href={`data:image/png;base64,${message.image}`} download={`prophete-developpeur-img-${message.id}.png`} className="p-1.5 text-white hover:bg-white/20 rounded-md" data-tooltip="Télécharger">
+                            <a href={`data:image/png;base64,${message.image}`} download={`prophete-developpeur-img-${message.id}.png`} className="p-1.5 text-white hover:bg-white/20 rounded-md" aria-label="Télécharger l'image">
                                 <DownloadIcon className="h-4 w-4" />
                             </a>
                         </div>
@@ -257,17 +265,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
             </div>
             {!isUser && message.content && message.content !== '...' && (
-                <div className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-full ml-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-full ml-2 flex items-center gap-1 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity">
                     <button
                         onClick={handleCopyText}
-                        data-tooltip="Copier le texte"
+                        aria-label="Copier le texte"
                         className="p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                         {isTextCopied ? <CheckIcon className="h-4 w-4 text-green-500" /> : <ClipboardIcon className="h-4 w-4" />}
                     </button>
                     <button
                         onClick={handleSpeak}
-                        data-tooltip={isSpeaking ? "Arrêter la lecture" : "Lire le texte"}
+                        aria-label={isSpeaking ? "Arrêter la lecture" : "Lire le texte"}
                         className={`p-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 ${isSpeaking ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
                     >
                         <SpeakerWaveIcon className="h-4 w-4" />
@@ -275,6 +283,18 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                 </div>
             )}
         </div>
+        
+        {message.image && (
+             <div className="mt-2">
+                <button 
+                    onClick={handleEditImage}
+                    className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors bg-indigo-500/10 dark:bg-indigo-500/20 hover:bg-indigo-500/20 dark:hover:bg-indigo-500/30 px-3 py-1.5 rounded-lg"
+                >
+                    <PencilIcon className="h-4 w-4" />
+                    Éditer cette image
+                </button>
+            </div>
+        )}
 
         {message.sources && message.sources.length > 0 && (
           <div className="mt-4">
@@ -298,7 +318,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       </div>
       {isUser && (
         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center order-2 shadow-md">
-          <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+          <UserIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" aria-hidden="true" />
         </div>
       )}
     </div>

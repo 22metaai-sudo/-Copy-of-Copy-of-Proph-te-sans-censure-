@@ -12,7 +12,6 @@ import { DevelopmentView } from './components/DevelopmentView';
 import { IntegrationsView } from './components/IntegrationsView';
 import { Toast } from './components/Toast';
 import { WelcomeScreen } from './components/WelcomeScreen';
-import { MainRail } from './components/MainRail';
 import { SunIcon } from './components/icons/SunIcon';
 import { MoonIcon } from './components/icons/MoonIcon';
 
@@ -63,13 +62,8 @@ const App: React.FC = () => {
     }
     return 'dark'; // Default to dark
   });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-        const savedState = window.localStorage.getItem('sidebarOpen');
-        return savedState ? JSON.parse(savedState) : true;
-    }
-    return true;
-  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [imageToEdit, setImageToEdit] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'info' = 'success') => {
     setToast({ message, type });
@@ -92,12 +86,6 @@ const App: React.FC = () => {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('sidebarOpen', JSON.stringify(isSidebarOpen));
-    }
-  }, [isSidebarOpen]);
 
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -130,6 +118,24 @@ const App: React.FC = () => {
     }
     setActiveView('chat');
   }, []);
+
+  const handleEditImageFromChat = useCallback((imageBase64: string) => {
+    setImageToEdit(imageBase64);
+    setActiveView('edit');
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+        const customEvent = event as CustomEvent<string>;
+        if (customEvent.detail) {
+            handleEditImageFromChat(customEvent.detail);
+        }
+    };
+    window.addEventListener('editImage', handler);
+    return () => {
+        window.removeEventListener('editImage', handler);
+    };
+  }, [handleEditImageFromChat]);
 
   // Load conversations from localStorage on initial render.
   useEffect(() => {
@@ -245,7 +251,7 @@ const App: React.FC = () => {
             );
         case 'development': return <DevelopmentView />;
         case 'generate': return <ImageGenerationView />;
-        case 'edit': return <ImageEditingView />;
+        case 'edit': return <ImageEditingView initialImageBase64={imageToEdit} onDone={() => setImageToEdit(null)}/>;
         case 'video': return <VideoGenerationView />;
         case 'slides': return <SlidesGenerationView />;
         case 'sheets': return <SheetsGenerationView />;
@@ -262,7 +268,6 @@ const App: React.FC = () => {
     <div className="flex flex-col h-screen w-full text-gray-900 dark:text-white font-sans bg-transparent">
       <StatusBar />
       <div className="flex-1 flex overflow-hidden">
-        <MainRail activeView={activeView} onNavigate={handleNavigate} onGoHome={handleGoHome} />
 
         {activeView === 'chat' && (
             <Sidebar
@@ -283,6 +288,9 @@ const App: React.FC = () => {
               isSidebarVisible={activeView === 'chat'}
               isSidebarOpen={isSidebarOpen}
               toggleSidebar={toggleSidebar}
+              activeView={activeView}
+              onNavigate={handleNavigate}
+              onGoHome={handleGoHome}
           />
           <div className="flex-1 flex flex-col overflow-hidden bg-gray-100 dark:bg-gray-900/50">
               {renderActiveView()}

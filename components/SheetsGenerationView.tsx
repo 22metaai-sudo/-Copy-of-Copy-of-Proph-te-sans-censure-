@@ -94,6 +94,7 @@ export const SheetsGenerationView: React.FC = () => {
                             value={topic}
                             onChange={e => setTopic(e.target.value)}
                             placeholder="Ex: Les 10 plus grandes villes de la Caraïbe avec leur population et pays"
+                            aria-label="Description des données à générer"
                             className="flex-grow p-3 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
                             disabled={isLoading}
                         />

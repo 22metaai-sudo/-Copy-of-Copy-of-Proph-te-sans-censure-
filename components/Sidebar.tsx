@@ -32,7 +32,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
       <aside
-        className={`flex flex-col h-full bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-800 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700/60 shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'w-80 p-4' : 'w-0 p-0 border-r-0'}`}
+        id="sidebar"
+        className={`flex flex-col h-full bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-800 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700/60 shrink-0 transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'w-72 p-4' : 'w-0 p-0 border-r-0'}`}
         aria-hidden={!isOpen}
       >
         <div className="flex items-center justify-between mb-4">
@@ -46,10 +47,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
         <div className="relative mb-4">
+            <label htmlFor="sidebar-search" className="sr-only">
+                Rechercher dans l'historique
+            </label>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <SearchIcon className="h-5 w-5 text-gray-400" />
+                <SearchIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </div>
             <input
+                id="sidebar-search"
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -84,7 +89,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-400 dark:text-gray-500 hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/20 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                     aria-label="Supprimer la conversation"
-                    data-tooltip="Supprimer"
                 >
                     <TrashIcon className="h-4 w-4" />
                 </button>
@@ -96,7 +100,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
            <button 
               onClick={onClearAll}
               className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 rounded-lg hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/20 transition-colors"
-              data-tooltip="Supprime toutes les conversations"
+              aria-label="Supprime toutes les conversations"
             >
                 <TrashIcon className="h-4 w-4" />
                 <span>Effacer tout l'historique</span>
